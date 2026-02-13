@@ -1,0 +1,21 @@
+# Sample inference log data
+# Format: timestamp,model,latency_ms,status
+
+2024-01-15T10:00:01.123,resnet50,12.5,success
+2024-01-15T10:00:01.234,resnet50,11.8,success
+2024-01-15T10:00:01.345,resnet50,13.2,success
+2024-01-15T10:00:01.456,resnet50,12.1,success
+2024-01-15T10:00:01.567,resnet50,85.3,success
+2024-01-15T10:00:01.678,resnet50,11.9,success
+2024-01-15T10:00:01.789,resnet50,12.4,success
+2024-01-15T10:00:01.890,resnet50,12.0,success
+2024-01-15T10:00:02.001,bert-base,45.2,success
+2024-01-15T10:00:02.112,bert-base,44.8,success
+2024-01-15T10:00:02.223,bert-base,46.1,success
+2024-01-15T10:00:02.334,bert-base,250.5,timeout
+2024-01-15T10:00:02.445,bert-base,45.0,success
+2024-01-15T10:00:02.556,bert-base,44.5,success
+2024-01-15T10:00:02.667,mobilenet,8.2,success
+2024-01-15T10:00:02.778,mobilenet,7.9,success
+2024-01-15T10:00:02.889,mobilenet,8.5,success
+2024-01-15T10:00:03.000,mobilenet,8.1,success
