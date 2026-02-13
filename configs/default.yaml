@@ -1,0 +1,183 @@
+# Inference Log Analytics - Default Configuration
+# ================================================
+
+# Parser Configuration
+parsers:
+  # Default parser to use when auto-detection fails
+  default: "custom"
+  
+  # Parser-specific settings
+  onnx_runtime:
+    timestamp_format: "%Y-%m-%d %H:%M:%S"
+    default_model: "unknown"
+  
+  tensorflow_serving:
+    timestamp_format: "%Y-%m-%dT%H:%M:%S.%fZ"
+    log_level_filter: null  # null = all levels
+  
+  triton:
+    timestamp_format: "ISO8601"
+    parse_model_version: true
+  
+  custom:
+    # Field mappings for custom log formats
+    field_mapping:
+      timestamp: ["timestamp", "ts", "time", "@timestamp"]
+      request_id: ["request_id", "req_id", "id", "correlation_id"]
+      model_name: ["model_name", "model", "model_id"]
+      latency_ms: ["latency_ms", "latency", "duration_ms", "response_time"]
+      status: ["status", "success", "result"]
+      batch_size: ["batch_size", "batch"]
+      error_message: ["error_message", "error", "message"]
+    
+    # Default delimiter for delimited formats
+    delimiter: ","
+    
+    # JSON path for nested logs
+    json_path: null
+
+# Analyzer Configuration
+analyzers:
+  latency:
+    # Percentiles to compute
+    percentiles: [50, 90, 95, 99, 99.9]
+    
+    # Time series bucket interval (minutes)
+    time_series_interval_minutes: 1
+    
+    # Slow request threshold percentile
+    slow_request_percentile: 99
+  
+  throughput:
+    # Time series bucket interval (minutes)
+    time_series_interval_minutes: 1
+    
+    # Minimum requests for valid statistics
+    min_requests: 10
+  
+  errors:
+    # Minimum occurrences to report error pattern
+    min_pattern_occurrences: 3
+    
+    # Error burst detection window (seconds)
+    burst_window_seconds: 60
+    
+    # Error burst threshold count
+    burst_threshold: 5
+    
+    # Custom error categories (in addition to defaults)
+    custom_categories: []
+  
+  anomaly:
+    # Z-score threshold for anomaly detection
+    z_score_threshold: 3.0
+    
+    # Moving window size for baseline calculation
+    window_size: 100
+    
+    # Minimum data points before detection starts
+    min_data_points: 50
+
+# Alerting Configuration
+alerts:
+  # Enable/disable alerting
+  enabled: true
+  
+  # Default cooldown between alerts (seconds)
+  default_cooldown_seconds: 300
+  
+  # Default rules
+  rules:
+    - name: "high_p99_latency"
+      type: "latency_threshold"
+      enabled: true
+      severity: "warning"
+      p99_threshold_ms: 100
+      cooldown_seconds: 300
+    
+    - name: "critical_p99_latency"
+      type: "latency_threshold"
+      enabled: true
+      severity: "critical"
+      p99_threshold_ms: 500
+      cooldown_seconds: 60
+    
+    - name: "high_error_rate"
+      type: "error_rate"
+      enabled: true
+      severity: "error"
+      threshold_percent: 1.0
+      min_requests: 100
+      cooldown_seconds: 300
+    
+    - name: "critical_error_rate"
+      type: "error_rate"
+      enabled: true
+      severity: "critical"
+      threshold_percent: 5.0
+      min_requests: 50
+      cooldown_seconds: 60
+    
+    - name: "throughput_drop"
+      type: "throughput_drop"
+      enabled: true
+      severity: "warning"
+      drop_percent: 50
+      baseline_window_hours: 1
+      evaluation_window_minutes: 5
+    
+    - name: "anomaly_burst"
+      type: "anomaly_count"
+      enabled: true
+      severity: "warning"
+      threshold_count: 10
+      evaluation_window_minutes: 15
+  
+  # Alert handlers
+  handlers:
+    console:
+      enabled: true
+    
+    file:
+      enabled: true
+      path: "alerts.log"
+    
+    webhook:
+      enabled: false
+      url: "https://your-webhook-url/alerts"
+
+# Visualization Configuration
+visualization:
+  # Default figure size
+  figure_size: [12, 6]
+  
+  # DPI for saved figures
+  dpi: 150
+  
+  # Color scheme
+  colors:
+    primary: "steelblue"
+    success: "green"
+    warning: "orange"
+    error: "red"
+    anomaly: "purple"
+  
+  # Time format for x-axis
+  time_format: "%H:%M"
+
+# Report Configuration
+reports:
+  # Default report format
+  default_format: "html"
+  
+  # Include plots in reports
+  include_plots: true
+  
+  # Output directory
+  output_dir: "./reports"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: null  # Set to filepath to enable file logging
